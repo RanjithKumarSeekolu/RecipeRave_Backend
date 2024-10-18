@@ -49,8 +49,27 @@ async function httpGetUser(req, res) {
   }
 }
 
+async function httpDeleteUser(req, res) {
+  try {
+    const { id } = req.params;
+
+    const user = await userModel.findByPk(id);
+    if (!user) {
+      sendResponse(res, 404, null, "User not found");
+    }
+
+    const status = await user.destroy();
+    console.log(status);
+    res.status(200).json({ message: "User deleted successfully" });
+  } catch (err) {
+    console.log(err);
+    sendError(res, err);
+  }
+}
+
 module.exports = {
   httpCreateUser,
   httpGetAllUsers,
   httpGetUser,
+  httpDeleteUser,
 };
