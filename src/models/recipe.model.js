@@ -1,5 +1,6 @@
 const { sequelize } = require("../services/sequelize");
 const { DataTypes } = require("sequelize");
+const User = require("./user.model");
 
 const Recipe = sequelize.define(
   "Recipe",
@@ -16,7 +17,7 @@ const Recipe = sequelize.define(
     author_id: {
       type: DataTypes.UUID,
       references: {
-        model: "users", // Assumes the Users model is defined elsewhere
+        model: User,
         key: "id",
       },
       allowNull: false,
@@ -55,5 +56,9 @@ const Recipe = sequelize.define(
     underscored: true, // This ensures snake_case column names are used
   }
 );
+
+// Association: A recipe belongs to a user (author), and a user has many recipes
+Recipe.belongsTo(User, { foreignKey: "author_id", as: "author" });
+User.hasMany(Recipe, { foreignKey: "author_id", as: "recipes" });
 
 module.exports = Recipe;
