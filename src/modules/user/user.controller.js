@@ -3,14 +3,27 @@ const { sendResponse, sendError } = require("../../utils/response");
 
 async function httpCreateUser(req, res) {
   try {
+    const { username, email, password, profile_picture_url } = req.body.data;
+    if (!username || !email || !password) {
+      return sendResponse(res, 400, null, "All fields are required");
+    }
+    const newUser = await userModel.create({
+      username: username,
+      email: email,
+      password_hash: password,
+      profile_picture_url: profile_picture_url,
+    });
+
+    return sendResponse(res, 201, newUser, null);
   } catch (err) {
+    console.error(err);
     sendError(res, err);
   }
 }
 
 async function httpGetAllUsers(req, res) {
   try {
-    const users = await userModel.findAll({ where: {} });
+    const users = await userModel.findAndCountAll({ where: {} });
     return sendResponse(res, 200, users, null);
   } catch (err) {
     sendError(res, err);
@@ -37,6 +50,7 @@ async function httpGetUser(req, res) {
 }
 
 module.exports = {
+  httpCreateUser,
   httpGetAllUsers,
   httpGetUser,
 };
